@@ -54,7 +54,7 @@
     <div id="wrapper">
       <div id="browser">
         <div id="documents"><a class="load-document" href="https-wildcard-nginx-setup.html">
-  <div class="document active" id="https-wildcard-nginx-setup">
+  <div class="document" id="https-wildcard-nginx-setup">
     <div class="published" data-published="2015-04-30T06:32:56.584Z">April 2015</div>
     <div class="title">Setting up HTTPS with a wildcard certificate and Nginx</div>
     <div class="teaser">How I set up HTTPS with Nginx</div>
@@ -127,7 +127,7 @@
 </a>
 
 <a class="load-document" href="a-proposal-for-streaming-xhr.html">
-  <div class="document" id="a-proposal-for-streaming-xhr">
+  <div class="document active" id="a-proposal-for-streaming-xhr">
     <div class="published" data-published="2012-11-20T20:48:11.493Z">November 2012</div>
     <div class="title">A Proposal For Streaming XHR</div>
     <div class="teaser">XHR2 isn't stream friendly. Lets explore why and propose a solution!</div>
@@ -182,94 +182,94 @@
   </div>
 </a></div>
       </div>
-      <div id="document"><div id="header"><h1 class="title">Setting up HTTPS with a wildcard certificate and Nginx</h1></div>
+      <div id="document"><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Style-Type" content="text/css">
+    <meta name="generator" content="pandoc">
+    <meta name="author" content="Max Ogden">
+    <title>A Proposal For Streaming XHR</title>
+  </head>
+  
+  <body>
+    <div id="header">
+      <h1 class="title">A Proposal For Streaming XHR</h1>
+      <h2 class="author">Max Ogden</h2>
+    </div>
+    <p>XHR2 isn't stream friendly. Lets explore why and propose a solution!</p>
+    <p>Note: This article predates the <a href="https://streams.spec.whatwg.org/">HTML5 Streams work</a></p>
+    <p><a href="http://www.html5rocks.com/en/tutorials/file/xhr2/">XHR2</a> (XHR is short for XMLHTTPRequest and is the HTTP client in AJAX) does some cool stuff. You can get binary response data, either read-only in a <a href="https://developer.mozilla.org/en-US/docs/DOM/Blob">Blob</a> or mutable in an <a href="https://developer.mozilla.org/en-US/docs/JavaScript_typed_arrays/ArrayBuffer#ArrayBuffer()">Array Buffer</a> (which you can turn into one of the many flavors of <a href="https://developer.mozilla.org/en-US/docs/JavaScript_typed_arrays">Typed Arrays</a>). Binary data in JavaScript pushes the boundaries of the web by enabling rich multimedia experiences (like those demonstrated in <a href="http://www.youtube.com/watch?v=PN8Eg1K9xjE">this mind-blowing talk</a> on the Web Audio API by <a href="twitter.com/stuartmemo">@stuartmemo</a>).</p>
+    <p>There is one fundamental problem with the current XHR specification (and implementations) which is that they aren't designed for real-time streaming, but with a few tweaks I believe they can enable a much better web experience.
+      
+    <p>Here is an example of trying to wrap XHR in the <a href="https://github.com/substack/stream-handbook">node.js Stream API</a>. The important part of the following code is the <code>write</code> function which takes the Array Buffer that XHR returns, turns it into a Typed Array and then emits each new chunk of binary data each time that xhr.readyState 3 is fired.</p>
+<pre><code data-language="javascript">var stream = require('stream')
+var util = require('util')
 
-<p>How I set up HTTPS with Nginx, April 2015</p>
-<p>I finally got a wildcard certificate for my new domain <code>publicbits.org</code>. This means I can use one cert for e.g. <code>https://foo.publicbits.org</code> or <code>https://bar.publicbits.org</code> but also <code>https://publicbits.org</code> or <code>https://www.publicbits.org</code>.</p>
-<p>At the recommendation of my friend <a href="https://konklone.com/">Eric Mill</a> I decided to try out <a href="https://sslmate.com/">SSLMate</a>. Wildcard certs aren&#39;t cheap. From SSLMate it costs $149 USD. However, it was super easy compared to every other SSL purchasing experience I&#39;ve ever dealt with.</p>
-<p>It should take about 20 minutes to do all the things in this blog post.</p>
-<p>I have high hopes for <a href="https://letsencrypt.org">Let&#39;s Encrypt</a>, which will essentially make this process cost $0 instead of $149, but until then this is the easiest way to do it that I&#39;ve seen.</p>
-<p>Note: my domain <code>maxogden.com</code> is hosted on GitHub Pages and they don&#39;t yet support HTTPS with custom domains. Email GitHub support and request this feature if it is important to you!</p>
-<h2 id="installing-sslmate-and-buying-the-cert">Installing SSLMate and buying the cert</h2>
-<p>First I <a href="https://sslmate.com/signup">signed up at SSLMate</a>. I picked a username and password and entered my payment info.</p>
-<p>Then they have you install their <code>sslmate</code> CLI utility.</p>
-<pre><code class="lang-sh">sudo wget -P /etc/apt/sources.list.d https://sslmate.com/apt/ubuntu1404/sslmate.list
-sudo wget -P /etc/apt/trusted.gpg.d https://sslmate.com/apt/ubuntu1404/sslmate.gpg
-sudo apt-get update
-sudo apt-get install sslmate
-</code></pre>
-<p>Then you can buy a wildcard cert from the CLI:</p>
-<pre><code class="lang-sh">sslmate buy *.publicbits.org
-</code></pre>
-<p>Then they ask you some questions, verify the order, purchase the cert and then send you an email. The email has instructions for verifying your ownership of the domain on a Comodo site. Turns out SSLMate is basically a user friendly front end to Comodo&#39;s positiveSSL service. I really appreciate how easy they make the process, and hope more SSL providers will follow suit!</p>
-<p>Then I did <code>mkdir keys</code> and <code>cd keys</code>. I was now in <code>/home/max/keys</code>.</p>
-<p>Next was <code>sslmate download --all</code>. Now a bunch of files appeared in my <code>keys</code> folder.</p>
-<p>The ones I&#39;m using are <code>*.publicbits.org.key</code> and <code>*.publicbits.org.chained.crt</code>.</p>
-<h2 id="installing-and-configuring-nginx">Installing and configuring Nginx</h2>
-<p>Then I installed the latest Nginx. I have a utility I wrote last year called <a href="https://github.com/maxogden/install-nginx-on-ubuntu">install-nginx-on-ubuntu</a> that I used. It basically does this:</p>
-<pre><code class="lang-sh">sudo apt-get install -y software-properties-common
-sudo add-apt-repository -y ppa:nginx/stable
-sudo apt-get update
-sudo apt-get install -y nginx
-sudo initctl start nginx
-</code></pre>
-<p>Then after lots of twiddling around with configs I ended up creating this &#39;default&#39; config and wrote it to <code>/etc/nginx/conf.d/ssl.conf</code>. It redirects all <code>http://</code> traffic to <code>https://</code>.</p>
-<pre><code># redirect http -&gt; https
-server {
-  listen 80;
-  server_name *.publicbits.org;
-  return 301 https://$host$request_uri;
-}  
-
-# default config (server_name _; makes this &#39;base&#39; config)
-server {
-  listen 443 default ssl;
-  server_name _;
-
-  ssl_certificate_key /home/max/keys/*.publicbits.org.key;
-  ssl_certificate /home/max/keys/*.publicbits.org.chained.crt;
-
-  # These this next block of settings came directly from the SSLMate recommend nginx configuration
-  # Recommended security settings from https://wiki.mozilla.org/Security/Server_Side_TLS
-  ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
-  ssl_ciphers &#39;ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA&#39;;
-  ssl_prefer_server_ciphers on;
-  ssl_session_timeout 5m;
-  ssl_session_cache shared:SSL:5m;
-  # Enable this if you want HSTS (recommended)
-  add_header Strict-Transport-Security max-age=15768000;
-
-  # from https://gist.github.com/konklone/6532544
-  # Generated by OpenSSL with the following command:
-  #   openssl dhparam -outform pem -out dhparam2048.pem 2048
-  ssl_dhparam /home/max/keys/dhparam2048.pem;
-}
-</code></pre><p>Make sure you run <code>openssl dhparam -outform pem -out dhparam2048.pem 2048</code> inside your <code>keys</code> folder (it will take a while).</p>
-<h2 id="deploying-processes">Deploying processes</h2>
-<p>Then I use <a href="https://www.npmjs.com/package/taco-nginx">taco-nginx</a> to deploy individual processes:</p>
-<pre><code>taco-nginx --name signalhub signalhub listen -m 10
-</code></pre><p><code>taco-nginx</code> takes care of generating a configuration for my app and then reloading nginx. For the above command the configuration file it generated is <code>/etc/nginx/conf.d/signalhub.conf</code> with the contents:</p>
-<pre><code># generated by taco-nginx
-upstream signalhub {
-  server 127.0.0.1:54082;
+function XHRStream(xhr) {
+  stream.Stream.call(this)
+  this.xhr = xhr
+  this.offset = 0
+  xhr.onreadystatechange = this.handle.bind(this)
+  xhr.send(null)
 }
 
-server {
-  listen 443;
-  server_name signalhub.*;
-  location / {
-    proxy_pass http://signalhub;
-    proxy_set_header X-Forwarded-For $remote_addr;
-    proxy_buffering off;
-    proxy_request_buffering off;
-    proxy_http_version 1.1;
+// copy the Stream methods to this prototype
+util.inherits(XHRStream, stream.Stream)
+
+XHRStream.prototype.handle = function () {
+  // readyState 3 will be fired many times during a large download
+  if (this.xhr.readyState === 3) this.write()
+  if (this.xhr.readyState === 4) this.emit('end')
+}
+
+XHRStream.prototype.write = function () {
+  if (!this.responseArray) this.responseArray = new Int8Array(this.xhr.response)
+  if (this.responseArray.byteLength > this.offset) {
+    this.emit('data', this.responseArray.slice(this.offset))
+    this.offset = this.responseArray.byteLength
   }
 }
-</code></pre><p>With this configuration I can deploy new apps with <code>taco-nginx</code> quickly without having to configure them for HTTPS, since Nginx can reverse proxy HTTPS -&gt; HTTP. </p>
-<p>My <a href="https://www.ssllabs.com/ssltest/analyze.html?d=signalhub.publicbits.org">score on SSLLabs</a> is an A:</p>
-<p><img src="media/ssllabs.png" alt="ssl labs"></p>
-<p>Thanks a ton to <a href="https://konklone.com">Eric Mill</a> for helping tweak my HTTPS settings and <a href="https://github.com/mafintosh">Mathias Buus</a> for helping with Nginx.</p>
-</div>
+
+module.exports = XHRStream
+</code></pre>
+    <p>Fundamentally what node Streams (and the above code) do is take a huge response that may take a loooooong time to complete (like downloading a Blu-ray DVD) and splits the response up into chunks. This is a beautiful pattern due to its simplicity. The programmer can decide if they want to combine the chunks and store them in a file or database OR if they want to process the chunks one at a time immediately and then throw the chunks away so that the JavaScript VM can clean the chunks up and free up the memory they were using. The <code>xhr.response</code> (<code>xhr.responseText</code> when getting non-binary responseTypes) in an XHR request is a single JavaScript object that just grows and grows and grows so if you are downloading a 5GB file you will have a 5GB JavaScript object in memory at the end of the request. The "node way" would be to have hundreds of small objects that each contain a contiguous chunk of the file that get emitted as soon as the client receives the data from the network.</p>
+    <p>The XHRStream prototype lets you write code that looks like this:</p>
+<pre><code data-language="javascript">var xhr = new XMLHttpRequest()
+xhr.responseType = 'arraybuffer'
+xhr.open("GET", "http://bigdata.com/hugefile.zip", true)
+var response = new XHRStream(xhr)
+
+// 'data' events will happen each time a new chunk gets to the browser
+response.on('data', function(chunk) {
+  // chunk size in this case is determined by TCP and will
+  // probably be in the range of 10s or 100s of kilobytes
+})
+</code></pre>
+    <p>Unfortunately this isn't possible with the current XHR implementation for two reasons. The first is that <code>xhr.response</code> is essentially one big buffer that keeps growing linearly as the response data comes in which means it can't get garbage collected. This just means you can't download files with XHR that are larger than the amount of RAM in your machine which isn't a total deal breaker for streaming data. The other reason is that currently the XHR spec prevents access to binary response data before the request has completed. Here is a simplified excerpt from the <a href="http://www.w3.org/TR/XMLHttpRequest/#the-response-attribute">XMLHTTPRequest specification on w3.org</a> (thanks to <a href="http://twitter.com/tobie">@tobie</a> for assisting me in navigating the web standards world here):</p>
+    <pre><code>If responseType is "text"
+  If the state is not LOADING or DONE, return empty string and terminate these steps
+  Otherwise return the text response entity body.
+Otherwise (for all other types of responseTypes such as 'arraybuffer' or 'blob')
+  If the state is not DONE, return null and terminate these steps.
+    </code></pre>
+    <p>Here is <a href="http://lists.whatwg.org/pipermail/whatwg-whatwg.org/2011-January/029992.html">a discussion from the whatwg mailing list</a> on this topic that contains this particularly insightful comment:</p>
+    <pre><code>Hmm! And I guess it's very difficult to create a abstract in/out 
+interface that can handle any protocol/stream.
+Although an abstract in/out would be ideal as that would let new 
+protocols to be supported without needing to rewrite anything at the 
+higher level.
+
+-- 
+Roger "Rescator" Hågensen.
+    </code></pre>
+    <p>I totally agree! It turns out that the node Stream API, which is the core I/O abstraction in Node.js (which is a tool for I/O) is essentially an abstract in/out interface that can handle any protocol/stream that also happens to be written in JavaScript.</p>
+    <p>It should be noted that websockets now support transporting binary data but the websocket spec still <a href="https://github.com/maxogden/websocket-stream/issues/1">isn't perfect</a> for streaming and the overwhelming majority of APIs are HTTP.</p>
+    <p>So, to any standards people or browser implementers reading this: please please please take some notes from Node.js and change the spec to allow for truly streaming data over XMLHTTPRequest.</p>
+</p></body>
+
+</html></div>
     </div>
   </div>  
   

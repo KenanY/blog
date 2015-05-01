@@ -54,7 +54,7 @@
     <div id="wrapper">
       <div id="browser">
         <div id="documents"><a class="load-document" href="https-wildcard-nginx-setup.html">
-  <div class="document active" id="https-wildcard-nginx-setup">
+  <div class="document" id="https-wildcard-nginx-setup">
     <div class="published" data-published="2015-04-30T06:32:56.584Z">April 2015</div>
     <div class="title">Setting up HTTPS with a wildcard certificate and Nginx</div>
     <div class="teaser">How I set up HTTPS with Nginx</div>
@@ -167,7 +167,7 @@
 </a>
 
 <a class="load-document" href="gut-hosted-open-data-filets.html">
-  <div class="document" id="gut-hosted-open-data-filets">
+  <div class="document active" id="gut-hosted-open-data-filets">
     <div class="published" data-published="2011-12-02T20:36:31.424Z">December 2011</div>
     <div class="title">Gut: Hosted Open Data Filet Knives</div>
     <div class="teaser">HTTP Unix pipes for Open Data</div>
@@ -182,94 +182,138 @@
   </div>
 </a></div>
       </div>
-      <div id="document"><div id="header"><h1 class="title">Setting up HTTPS with a wildcard certificate and Nginx</h1></div>
+      <div id="document"><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Style-Type" content="text/css">
+    <meta name="generator" content="pandoc">
+    <meta name="author" content="Max Ogden">
+    <title>Gut: Hosted Open Data Filet Knives</title>
+  </head>
+  
+  <body>
+    <div id="header">
+      
+<h1 class="title">Gut: Hosted Open Data Filet Knives</h1>
 
-<p>How I set up HTTPS with Nginx, April 2015</p>
-<p>I finally got a wildcard certificate for my new domain <code>publicbits.org</code>. This means I can use one cert for e.g. <code>https://foo.publicbits.org</code> or <code>https://bar.publicbits.org</code> but also <code>https://publicbits.org</code> or <code>https://www.publicbits.org</code>.</p>
-<p>At the recommendation of my friend <a href="https://konklone.com/">Eric Mill</a> I decided to try out <a href="https://sslmate.com/">SSLMate</a>. Wildcard certs aren&#39;t cheap. From SSLMate it costs $149 USD. However, it was super easy compared to every other SSL purchasing experience I&#39;ve ever dealt with.</p>
-<p>It should take about 20 minutes to do all the things in this blog post.</p>
-<p>I have high hopes for <a href="https://letsencrypt.org">Let&#39;s Encrypt</a>, which will essentially make this process cost $0 instead of $149, but until then this is the easiest way to do it that I&#39;ve seen.</p>
-<p>Note: my domain <code>maxogden.com</code> is hosted on GitHub Pages and they don&#39;t yet support HTTPS with custom domains. Email GitHub support and request this feature if it is important to you!</p>
-<h2 id="installing-sslmate-and-buying-the-cert">Installing SSLMate and buying the cert</h2>
-<p>First I <a href="https://sslmate.com/signup">signed up at SSLMate</a>. I picked a username and password and entered my payment info.</p>
-<p>Then they have you install their <code>sslmate</code> CLI utility.</p>
-<pre><code class="lang-sh">sudo wget -P /etc/apt/sources.list.d https://sslmate.com/apt/ubuntu1404/sslmate.list
-sudo wget -P /etc/apt/trusted.gpg.d https://sslmate.com/apt/ubuntu1404/sslmate.gpg
-sudo apt-get update
-sudo apt-get install sslmate
-</code></pre>
-<p>Then you can buy a wildcard cert from the CLI:</p>
-<pre><code class="lang-sh">sslmate buy *.publicbits.org
-</code></pre>
-<p>Then they ask you some questions, verify the order, purchase the cert and then send you an email. The email has instructions for verifying your ownership of the domain on a Comodo site. Turns out SSLMate is basically a user friendly front end to Comodo&#39;s positiveSSL service. I really appreciate how easy they make the process, and hope more SSL providers will follow suit!</p>
-<p>Then I did <code>mkdir keys</code> and <code>cd keys</code>. I was now in <code>/home/max/keys</code>.</p>
-<p>Next was <code>sslmate download --all</code>. Now a bunch of files appeared in my <code>keys</code> folder.</p>
-<p>The ones I&#39;m using are <code>*.publicbits.org.key</code> and <code>*.publicbits.org.chained.crt</code>.</p>
-<h2 id="installing-and-configuring-nginx">Installing and configuring Nginx</h2>
-<p>Then I installed the latest Nginx. I have a utility I wrote last year called <a href="https://github.com/maxogden/install-nginx-on-ubuntu">install-nginx-on-ubuntu</a> that I used. It basically does this:</p>
-<pre><code class="lang-sh">sudo apt-get install -y software-properties-common
-sudo add-apt-repository -y ppa:nginx/stable
-sudo apt-get update
-sudo apt-get install -y nginx
-sudo initctl start nginx
-</code></pre>
-<p>Then after lots of twiddling around with configs I ended up creating this &#39;default&#39; config and wrote it to <code>/etc/nginx/conf.d/ssl.conf</code>. It redirects all <code>http://</code> traffic to <code>https://</code>.</p>
-<pre><code># redirect http -&gt; https
-server {
-  listen 80;
-  server_name *.publicbits.org;
-  return 301 https://$host$request_uri;
-}  
+      
+<h2 class="author">Max Ogden</h2>
 
-# default config (server_name _; makes this &#39;base&#39; config)
-server {
-  listen 443 default ssl;
-  server_name _;
+    </div>
+    <p>HTTP Unix pipes for Open Data</p>
+    
+<h1 id="not-invented-here">Not Invented Here</h1>
 
-  ssl_certificate_key /home/max/keys/*.publicbits.org.key;
-  ssl_certificate /home/max/keys/*.publicbits.org.chained.crt;
+    <p>A topic that has fascinated me for years now is (broadly speaking) <a href="http://en.wikipedia.org/wiki/Nationalism">nationalism</a>.
+      In the world of the internet that essentially boils down to something like
+      &quot;<em>I am a Python programmer and this project is written in Java! Ignored!&quot;</em>.
+      It is this behavior (which I see a lot in programming, mostly manifested
+      as &quot;<a href="http://en.wikipedia.org/wiki/Not_invented_here">Not invented here</a>&quot;)
+      that leads to a bunch of solutions to the same problem written in a bunch
+      of different languages where many of the solutions are half-baked.</p>
+    <p>For a concrete example consider open data catalogues. As evidenced by
+      <a href="http://datacatalogs.org">datacatalogs.org</a>there are a ton of different solutions to the same
+        set of problems, namely hosting open data. Having a rich ecosystem is a
+        good thing, but I believe that there is a common open data infrastructure
+        layer that we aren't maximizing our collaborating on: the conversion of
+        data between different formats.</p>
+    <p>Wouldn't it be great if I, as a Javascript developer, could use the awesome
+      data conversion libraries available in Java like <a href="http://poi.apache.org">Apache POI</a>?
+      Or if Ruby developers could use Python packages like <a href="https://github.com/onyxfish/csvkit">csvkit</a> (which
+      contains the super useful csvclean utility). The good news is that the
+      internet has settled on a common language for crossing these language barriers:
+      HTTP and JSON. Additionally, nowadays the web is filled with hosted services
+      (see SaaS, PaaS). There are numerous platforms where hosted services can
+      be deployed for free (Google App Engine, Heroku, Dotcloud, Nodejitsu, etc).</p>
+    <h1 id="unix-pipes">Unix pipes</h1>
+      <p>On the Unix command line there are a bunch of useful single purpose utilities.
+        The <a href="http://en.wikipedia.org/wiki/Unix_philosophy">Unix philosophy</a> is <em>&quot;write programs that do one thing and do it well. Write programs to work together. Write programs to handle text streams, because that is a universal interface&quot;</em>.
+        The Unix command <code>wc</code> is a great example. You give it a bunch
+        of text and it will count the number of words, lines and characters. Combined
+        with the <code>cat</code> command, which reads and file and dumps out all
+        the text, you can use a Unix pipe (the | character) to 'pipe' the data
+        that <code>cat</code> dumps out into <code>wc</code>:</p>
+<pre><code>cat awesomeText.txt | wc
+21      55     507</code></pre>
 
-  # These this next block of settings came directly from the SSLMate recommend nginx configuration
-  # Recommended security settings from https://wiki.mozilla.org/Security/Server_Side_TLS
-  ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
-  ssl_ciphers &#39;ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA&#39;;
-  ssl_prefer_server_ciphers on;
-  ssl_session_timeout 5m;
-  ssl_session_cache shared:SSL:5m;
-  # Enable this if you want HSTS (recommended)
-  add_header Strict-Transport-Security max-age=15768000;
+      
+<h1 id="what-is-gut">What is gut</h1>
 
-  # from https://gist.github.com/konklone/6532544
-  # Generated by OpenSSL with the following command:
-  #   openssl dhparam -outform pem -out dhparam2048.pem 2048
-  ssl_dhparam /home/max/keys/dhparam2048.pem;
-}
-</code></pre><p>Make sure you run <code>openssl dhparam -outform pem -out dhparam2048.pem 2048</code> inside your <code>keys</code> folder (it will take a while).</p>
-<h2 id="deploying-processes">Deploying processes</h2>
-<p>Then I use <a href="https://www.npmjs.com/package/taco-nginx">taco-nginx</a> to deploy individual processes:</p>
-<pre><code>taco-nginx --name signalhub signalhub listen -m 10
-</code></pre><p><code>taco-nginx</code> takes care of generating a configuration for my app and then reloading nginx. For the above command the configuration file it generated is <code>/etc/nginx/conf.d/signalhub.conf</code> with the contents:</p>
-<pre><code># generated by taco-nginx
-upstream signalhub {
-  server 127.0.0.1:54082;
-}
+      <p>Taking heavy inspiration from unix pipes, HTTP and JSON I have come up
+        with a modest proposal for how we might share our best tools for various
+        data conversion jobs as hosted web services. I'm calling it gut, as in
+        gutting a fish and getting the yummy filet out while leaving behind all
+        of the junk.</p>
+      <p>Here's a simple example of how a gut server would work that takes in a
+        CSV file and returns JSON data. As a developer using the gut server to
+        process my CSV file I would send the following HTTP request containing
+        my CSV data:</p>
+<pre><code>POST / HTTP/1.1
+User-Agent: curl
+Host: gutcsv.nodejitsu.com
+Accept: */*
+Content-Length: 64
+Content-Type: application/x-www-form-urlencoded
 
-server {
-  listen 443;
-  server_name signalhub.*;
-  location / {
-    proxy_pass http://signalhub;
-    proxy_set_header X-Forwarded-For $remote_addr;
-    proxy_buffering off;
-    proxy_request_buffering off;
-    proxy_http_version 1.1;
-  }
-}
-</code></pre><p>With this configuration I can deploy new apps with <code>taco-nginx</code> quickly without having to configure them for HTTPS, since Nginx can reverse proxy HTTPS -&gt; HTTP. </p>
-<p>My <a href="https://www.ssllabs.com/ssltest/analyze.html?d=signalhub.publicbits.org">score on SSLLabs</a> is an A:</p>
-<p><img src="media/ssllabs.png" alt="ssl labs"></p>
-<p>Thanks a ton to <a href="https://konklone.com">Eric Mill</a> for helping tweak my HTTPS settings and <a href="https://github.com/mafintosh">Mathias Buus</a> for helping with Nginx.</p>
-</div>
+name,appearance
+chewbacca,hairy
+bill,nonplussed
+bubbles,relaxed</code></pre>
+
+      <p>This is what the gut server would give me back:</p>
+<pre><code>POST / HTTP/1.1
+host: gutcsv.nodejitsu.com
+content-type: application/json
+content-length: 186
+Connection: close
+  
+{
+  &quot;headers&quot;: [
+    {
+      &quot;name&quot;: &quot;name&quot;
+    },
+    {
+      &quot;name&quot;: &quot;appearance&quot;
+    }
+  ],
+  &quot;rows&quot;: [
+    {
+      &quot;name&quot;: &quot;chewbacca&quot;,
+      &quot;appearance&quot;: &quot;hairy&quot;
+    },
+    {
+      &quot;name&quot;: &quot;bill&quot;,
+      &quot;appearance&quot;: &quot;nonplussed&quot;
+    },
+    {
+      &quot;name&quot;: &quot;bubbles&quot;,
+      &quot;appearance&quot;: &quot;relaxed&quot;
+    }
+  ]
+}</code></pre>
+
+      <p>Essentially I am piping data from my computer through a gut server and
+        when it comes back it is in the new format. In this example I used the
+        node.js hosting platform Nodejitsu to deploy my CSV-to-JSON code so that
+        it is available to anyone in the world who can make an HTTP request.</p>
+      <h1 id="voltron-assemble">Voltron, assemble!</h1>
+        <p>If you are writing code that converts data from one format to another,
+          consider also exposing your solution in the form of a gut server! Last
+          year I had great success at <a href="http://opendataday.org">International Open Data Day</a> teachin
+          ScraperWiki because it scaled out well to a room full of people with different
+          programming backgrounds. I think that writing these lightweight data converters/massagers/transformer
+          servers is also a task that anyone can tackle in a short amount of time.</p>
+        <p>There is a <a href="https://github.com/maxogden/gut">Github project</a> that
+          contains the current gut servers that I have been working on and also a
+          <a href="https://github.com/maxogden/gut/wiki/List-of-gut-servers">wiki page</a>where you can add your gut server to the list. Once there
+            are a handful of gut servers we can start working on more extensive discovery
+            and testing tools (ensuring gut server availability, better documentation,
+            web based gut server API playground, etc).</p>
+  </body>
+
+</html></div>
     </div>
   </div>  
   

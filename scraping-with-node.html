@@ -54,7 +54,7 @@
     <div id="wrapper">
       <div id="browser">
         <div id="documents"><a class="load-document" href="https-wildcard-nginx-setup.html">
-  <div class="document active" id="https-wildcard-nginx-setup">
+  <div class="document" id="https-wildcard-nginx-setup">
     <div class="published" data-published="2015-04-30T06:32:56.584Z">April 2015</div>
     <div class="title">Setting up HTTPS with a wildcard certificate and Nginx</div>
     <div class="teaser">How I set up HTTPS with Nginx</div>
@@ -135,7 +135,7 @@
 </a>
 
 <a class="load-document" href="scraping-with-node.html">
-  <div class="document" id="scraping-with-node">
+  <div class="document active" id="scraping-with-node">
     <div class="published" data-published="2012-10-24T20:48:11.493Z">October 2012</div>
     <div class="title">Scraping With Node</div>
     <div class="teaser">Useful modules and a tutorial on how to parse HTML with node.js</div>
@@ -182,94 +182,90 @@
   </div>
 </a></div>
       </div>
-      <div id="document"><div id="header"><h1 class="title">Setting up HTTPS with a wildcard certificate and Nginx</h1></div>
+      <div id="document"><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Style-Type" content="text/css">
+    <meta name="generator" content="pandoc">
+    <meta name="author" content="Max Ogden">
+    <title>Scraping with Node</title>
+  </head>
+  
+  <body>
+    <div id="header">
+      <h1 class="title">Scraping with Node</h1>
+      <h2 class="author">Max Ogden</h2>
+    </div>
+    <p>Modules and tutorial demonstrating HTML parsing with node.js</p>
+    <p>One of the the best parts about server side JavaScript is the lack of the DOM, but sometimes you need to parse HTML in your node programs. For a while JSDOM has been the most well known module for accomplishing this task, but it has a number of issues. The author, <a href="http://twitter.com/tmpvar">@tmpvar</a>, has been developing <a href="http://www.flickr.com/photos/gasi/7534134630/in/photostream/">super awesome node powered robots</a> instead of maintaining it. It also turns out that a full DOM level 3 implementation is super complex and crazy which means JSDOM suffers from some pretty bad memory leaks that leaves it unusable for a lot of complex use cases.</p>
+    <p>Instead of rewriting the DOM in pure JS, a more realistic approach is a nice and simple HTML parser that implements a CSS selector API. Enter <a href="http://npmjs.org/cheerio"><code>cheerio</code></a>, a module that can teach your server HTML.</p>
+    <p>Cheerio is built on top of the <a href="http://npmjs.org/htmlparser2"><code>htmlparser2</code></a> module, a sax-like parser for HTML/XML. The goal of Cheerio is to implement most of the jQuery API in pure JS, without the need for a DOM. There is a separate dependency called <a href="https://npmjs.org/package/cheerio-select"><code>cheerio-select</code></a> that implements the sizzle API. The <code>cheerio</code> module itself more or less implements the jQuery API.</p>
+    <h2>Using Cheerio</h2>
+    <p>Since there is no DOM in node you have to initialize a <code>cheerio</code> instance from an HTML string. (this example comes from the <a href="http://npmjs.org/cheerio#readme">cheerio readme</a>)</p>
+    
+<pre><code data-language="javascript">var cheerio = require(&#39;cheerio&#39;),
+    $ = cheerio.load(&#39;&lt;h2 class = &quot;title&quot;&gt;Hello world&lt;/h2&gt;&#39;);
 
-<p>How I set up HTTPS with Nginx, April 2015</p>
-<p>I finally got a wildcard certificate for my new domain <code>publicbits.org</code>. This means I can use one cert for e.g. <code>https://foo.publicbits.org</code> or <code>https://bar.publicbits.org</code> but also <code>https://publicbits.org</code> or <code>https://www.publicbits.org</code>.</p>
-<p>At the recommendation of my friend <a href="https://konklone.com/">Eric Mill</a> I decided to try out <a href="https://sslmate.com/">SSLMate</a>. Wildcard certs aren&#39;t cheap. From SSLMate it costs $149 USD. However, it was super easy compared to every other SSL purchasing experience I&#39;ve ever dealt with.</p>
-<p>It should take about 20 minutes to do all the things in this blog post.</p>
-<p>I have high hopes for <a href="https://letsencrypt.org">Let&#39;s Encrypt</a>, which will essentially make this process cost $0 instead of $149, but until then this is the easiest way to do it that I&#39;ve seen.</p>
-<p>Note: my domain <code>maxogden.com</code> is hosted on GitHub Pages and they don&#39;t yet support HTTPS with custom domains. Email GitHub support and request this feature if it is important to you!</p>
-<h2 id="installing-sslmate-and-buying-the-cert">Installing SSLMate and buying the cert</h2>
-<p>First I <a href="https://sslmate.com/signup">signed up at SSLMate</a>. I picked a username and password and entered my payment info.</p>
-<p>Then they have you install their <code>sslmate</code> CLI utility.</p>
-<pre><code class="lang-sh">sudo wget -P /etc/apt/sources.list.d https://sslmate.com/apt/ubuntu1404/sslmate.list
-sudo wget -P /etc/apt/trusted.gpg.d https://sslmate.com/apt/ubuntu1404/sslmate.gpg
-sudo apt-get update
-sudo apt-get install sslmate
+$(&#39;h2.title&#39;).text(&#39;Hello there!&#39;);
+$(&#39;h2&#39;).addClass(&#39;welcome&#39;);
+
+$.html();
+//=&gt; &lt;h2 class = &quot;title welcome&quot;&gt;Hello there!&lt;/h2&gt;
 </code></pre>
-<p>Then you can buy a wildcard cert from the CLI:</p>
-<pre><code class="lang-sh">sslmate buy *.publicbits.org
+<p>If you have an HTML file on disk that you want to load, you can use nodes <code>fs</code> module (warning: don't use sync calls inside an event loop, only use them when you don't care about performance):</p>
+
+<pre><code data-language="javascript">var $ = require('cheerio')
+var fs = require('fs')
+
+var htmlString = fs.readFileSync('index.html').toString()
+var parsedHTML = $.load(htmlString)
+
+// query for all elements with class 'foo' and loop over them
+parsedHTML('.foo').map(function(i, foo) {
+  // the foo html element into a cheerio object (same pattern as jQuery)
+  foo = $(foo)
+  console.log(foo.text())
+})
 </code></pre>
-<p>Then they ask you some questions, verify the order, purchase the cert and then send you an email. The email has instructions for verifying your ownership of the domain on a Comodo site. Turns out SSLMate is basically a user friendly front end to Comodo&#39;s positiveSSL service. I really appreciate how easy they make the process, and hope more SSL providers will follow suit!</p>
-<p>Then I did <code>mkdir keys</code> and <code>cd keys</code>. I was now in <code>/home/max/keys</code>.</p>
-<p>Next was <code>sslmate download --all</code>. Now a bunch of files appeared in my <code>keys</code> folder.</p>
-<p>The ones I&#39;m using are <code>*.publicbits.org.key</code> and <code>*.publicbits.org.chained.crt</code>.</p>
-<h2 id="installing-and-configuring-nginx">Installing and configuring Nginx</h2>
-<p>Then I installed the latest Nginx. I have a utility I wrote last year called <a href="https://github.com/maxogden/install-nginx-on-ubuntu">install-nginx-on-ubuntu</a> that I used. It basically does this:</p>
-<pre><code class="lang-sh">sudo apt-get install -y software-properties-common
-sudo add-apt-repository -y ppa:nginx/stable
-sudo apt-get update
-sudo apt-get install -y nginx
-sudo initctl start nginx
-</code></pre>
-<p>Then after lots of twiddling around with configs I ended up creating this &#39;default&#39; config and wrote it to <code>/etc/nginx/conf.d/ssl.conf</code>. It redirects all <code>http://</code> traffic to <code>https://</code>.</p>
-<pre><code># redirect http -&gt; https
-server {
-  listen 80;
-  server_name *.publicbits.org;
-  return 301 https://$host$request_uri;
-}  
 
-# default config (server_name _; makes this &#39;base&#39; config)
-server {
-  listen 443 default ssl;
-  server_name _;
+<p>Similarly, you can use the popular <a href="http://npmjs.org/request">request</a> module to grab HTML from a remote server using HTTP and then pass it to <code>cheerio</code>:</p>
 
-  ssl_certificate_key /home/max/keys/*.publicbits.org.key;
-  ssl_certificate /home/max/keys/*.publicbits.org.chained.crt;
+<pre><code data-language="javascript">var $ = require('cheerio')
+var request = require('request')
 
-  # These this next block of settings came directly from the SSLMate recommend nginx configuration
-  # Recommended security settings from https://wiki.mozilla.org/Security/Server_Side_TLS
-  ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
-  ssl_ciphers &#39;ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA&#39;;
-  ssl_prefer_server_ciphers on;
-  ssl_session_timeout 5m;
-  ssl_session_cache shared:SSL:5m;
-  # Enable this if you want HSTS (recommended)
-  add_header Strict-Transport-Security max-age=15768000;
-
-  # from https://gist.github.com/konklone/6532544
-  # Generated by OpenSSL with the following command:
-  #   openssl dhparam -outform pem -out dhparam2048.pem 2048
-  ssl_dhparam /home/max/keys/dhparam2048.pem;
-}
-</code></pre><p>Make sure you run <code>openssl dhparam -outform pem -out dhparam2048.pem 2048</code> inside your <code>keys</code> folder (it will take a while).</p>
-<h2 id="deploying-processes">Deploying processes</h2>
-<p>Then I use <a href="https://www.npmjs.com/package/taco-nginx">taco-nginx</a> to deploy individual processes:</p>
-<pre><code>taco-nginx --name signalhub signalhub listen -m 10
-</code></pre><p><code>taco-nginx</code> takes care of generating a configuration for my app and then reloading nginx. For the above command the configuration file it generated is <code>/etc/nginx/conf.d/signalhub.conf</code> with the contents:</p>
-<pre><code># generated by taco-nginx
-upstream signalhub {
-  server 127.0.0.1:54082;
+function gotHTML(err, resp, html) {
+  if (err) return console.error(err)
+  var parsedHTML = $.load(html)
+  // get all img tags and loop over them
+  var imageURLs = []
+  parsedHTML('a').map(function(i, link) {
+    var href = $(link).attr('href')
+    if (!href.match('.png')) return
+    imageURLs.push(domain + href)
+  })
 }
 
-server {
-  listen 443;
-  server_name signalhub.*;
-  location / {
-    proxy_pass http://signalhub;
-    proxy_set_header X-Forwarded-For $remote_addr;
-    proxy_buffering off;
-    proxy_request_buffering off;
-    proxy_http_version 1.1;
-  }
-}
-</code></pre><p>With this configuration I can deploy new apps with <code>taco-nginx</code> quickly without having to configure them for HTTPS, since Nginx can reverse proxy HTTPS -&gt; HTTP. </p>
-<p>My <a href="https://www.ssllabs.com/ssltest/analyze.html?d=signalhub.publicbits.org">score on SSLLabs</a> is an A:</p>
-<p><img src="media/ssllabs.png" alt="ssl labs"></p>
-<p>Thanks a ton to <a href="https://konklone.com">Eric Mill</a> for helping tweak my HTTPS settings and <a href="https://github.com/mafintosh">Mathias Buus</a> for helping with Nginx.</p>
-</div>
+var domain = 'http://substack.net/images/'
+request(domain, gotHTML)
+</code></pre>
+
+<p>Building on the last example, here is how to fetch the raw binary data of each <code>img</code> on the page and render the images in your terminal using <a href="http://npmjs.org/picture-tube">picture-tube</a> and the node <a href="https://github.com/substack/stream-handbook">Stream API</a>:</p>
+
+<pre><code data-language="javascript">var pictureTube = require('picture-tube')
+
+var randomIndex = Math.floor(Math.random() * imageURLs.length)
+var randomImage = imageURLs[randomIndex]
+request(randomImage).pipe(pictureTube()).pipe(process.stdout)
+</code></pre>
+
+<p><img src="media/picture-tube.png"></p>
+
+<p>Now, go forth and scrape!</p>
+</body>
+
+</html></div>
     </div>
   </div>  
   
